@@ -16,10 +16,23 @@ app = Flask(__name__)
 
 # Define Flask Routes
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 
 def index():
-    return render_template("index.html")
+    errors = []
+    recommendations = []
+
+    if request.method == "POST":
+        try:
+            movie = request.form['inputMovie']
+            recommendations.append(movie)
+        except:
+            errors.append(
+                    "Unable to find Movie. Please try again."
+                    )
+
+
+    return render_template("index.html", errors=errors, recommendations=recommendations)
 
 #@app.route("/testDBConnection")
 
@@ -30,14 +43,14 @@ def index():
 #    print(engine)
 #    return redirect('/', code=302)
 
-#@app.route("/recommendation", methods = ['POST'])
+# Route to Generate Recommendations
+@app.route("/recommendations")
 
-#def recommendation():
-#   print("input is here")
-#   result = request.form
-#   print(request.form)
-   #Here once we decide connecting to the DB or giving input directly to the model for getting the recommendations
-#   return redirect('/', code=302)
+def get_recommendations():
+    movies = ["The Third Man", "The African Queen", "Charade", "Casablanca", "Jurassic Park"]
+
+    #return movies
+    return redirect("/", code=302)
 
 #################################################
 # END Flask Setup
