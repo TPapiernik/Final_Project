@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 import psycopg2
 from config import db_password
 import time
+import model
 
 
 #################################################
