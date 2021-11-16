@@ -26,7 +26,9 @@ def index():
     if request.method == "POST":
         try:
             movie = request.form['inputMovie']
-            recommendations.append(movie)
+            #recommendations.append(movie)
+            recommendations = model.get_movies(movie)
+
         except:
             errors.append(
                     "Unable to find Movie. Please try again."
