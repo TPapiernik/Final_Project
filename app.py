@@ -47,13 +47,13 @@ def index():
 #    return redirect('/', code=302)
 
 # Route to Generate Recommendations
-@app.route("/recommendations")
+#@app.route("/recommendations")
 
-def get_recommendations():
-    movies = ["The Third Man", "The African Queen", "Charade", "Casablanca", "Jurassic Park"]
+#def get_recommendations():
+    #movies = ["The Third Man", "The African Queen", "Charade", "Casablanca", "Jurassic Park"]
 
     #return movies
-    return redirect("/", code=302)
+    #return redirect("/", code=302)
 
 #################################################
 # END Flask Setup

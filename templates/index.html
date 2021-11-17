@@ -20,7 +20,8 @@
 
     {% for entry in recommendations %}
 
-    <h4>{{ entry }}</h4>
+    <h4>{{ entry['title'] }}</h4>
+    <h4><a href="{{ entry['url'] }}">{{ entry['url'] }}</a></h4>
 
     {% endfor %}
 

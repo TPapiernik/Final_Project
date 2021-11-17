@@ -259,10 +259,18 @@ def get_movies(inputTitle):
     # Loop through k_min_non_zero
 
     for entry in k_min_non_zero:
+        
+        recommendation_dict = {}
+
+        # Dictionary Output:
         recommendation_index = list(distance_results_rand).index(entry)
-        recommendation_list.append(clustered_df.iloc[recommendation_index]['primaryTitle'])
-        #print(clustered_df.iloc[recommendation_index]['primaryTitle'])
-        #print(clustered_df.iloc[recommendation_index]['url'] + '\n')
+        recommendation_dict['title'] = clustered_df.iloc[recommendation_index]['primaryTitle']
+        recommendation_dict['url'] = clustered_df.iloc[recommendation_index]['url']
+
+        recommendation_list.append(recommendation_dict)
+
+        # Original Output:
+        #recommendation_list.append(clustered_df.iloc[recommendation_index]['primaryTitle'])
 
     return recommendation_list
 
@@ -270,7 +278,7 @@ def get_movies(inputTitle):
 
 #input_movie_text = input("Movie Title: ")
 
-#input_movie_text = "The Maltese Falcon (1941)"
+#input_movie_text = "Vertigo (1958)"
 
 #print(get_movies(input_movie_text))
 #get_movies(input_movie_text)
