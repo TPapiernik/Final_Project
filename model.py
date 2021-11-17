@@ -231,11 +231,14 @@ def get_movies(inputTitle):
         if distance == 0:
             continue
         else:
-            distance = distance + random.randrange(1, 9, 1)/10e15
+            distance = distance + random.randrange(1, 9, 1)/1e15
             
         distance_results_rand.append(distance)
 
     distance_results_rand = np.asarray(distance_results_rand)
+
+    # Include only Unique Distances in Array
+    distance_results_rand = np.unique(distance_results_rand)
 
 
     # #### Output Recommendations
@@ -245,7 +248,7 @@ def get_movies(inputTitle):
 
     k = 5
     k_min_non_zero = np.partition(distance_results_rand[np.nonzero(distance_results_rand)], k)[:k]
-
+    
     time_elapsed = round(time.time() - start_time, 1)
 
     print(f'\nInput Movie: {viewerTitle}\n')
@@ -266,11 +269,16 @@ def get_movies(inputTitle):
         recommendation_index = list(distance_results_rand).index(entry)
         recommendation_dict['title'] = clustered_df.iloc[recommendation_index]['primaryTitle']
         recommendation_dict['url'] = clustered_df.iloc[recommendation_index]['url']
+        recommendation_dict['averageRating'] = clustered_df.iloc[recommendation_index]['averageRating']
+        recommendation_dict['genres'] = clustered_df.iloc[recommendation_index]['genres']
 
         recommendation_list.append(recommendation_dict)
 
         # Original Output:
         #recommendation_list.append(clustered_df.iloc[recommendation_index]['primaryTitle'])
+
+    # Sort recommendatioin_list by 'averageRating'
+    recommendation_list = sorted(recommendation_list, key=lambda d: d['averageRating'], reverse=True)
 
     return recommendation_list
 

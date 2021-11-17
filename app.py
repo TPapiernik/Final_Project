@@ -35,7 +35,7 @@ def index():
                     )
 
 
-    return render_template("index.html", errors=errors, recommendations=recommendations)
+    return render_template("index.html", errors=errors, movie=movie, recommendations=recommendations)
 
 #@app.route("/testDBConnection")
 

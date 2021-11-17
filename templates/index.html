@@ -16,12 +16,19 @@
         <button type="submit" class="btn btn-default">Get Recommendations</button>
       </form>
     </div>
+    <h2>Input Movie Information:</h2>
+    <h4>Title: {{ movie }}</h4>
+    <h4>Average Rating: </h4>
+    <h4>Genres: </h4>
+
     <h2>Recommendations:</h2>
 
     {% for entry in recommendations %}
 
     <h4>{{ entry['title'] }}</h4>
     <h4><a href="{{ entry['url'] }}">{{ entry['url'] }}</a></h4>
+    <h4>Average Rating: {{ entry['averageRating'] }}</h4>
+    <h4>Genres: {{ entry['genres'] }}</h4>
 
     {% endfor %}
 
