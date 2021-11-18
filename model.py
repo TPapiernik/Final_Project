@@ -327,15 +327,12 @@ def get_movies(inputTitle):
         if distance == 0:
             continue
         else:
-            distance = distance + random.randrange(1, 9, 1)/10e15
+            distance = distance + random.randrange(-9, 9, 1)/10e15
             #distance = distance
             
         distance_results_rand.append(distance)
 
     distance_results_rand = np.asarray(distance_results_rand)
-
-    # Include only Unique Distances in Array
-    #distance_results_rand = np.unique(distance_results_rand)
 
 
     # #### Output Recommendations
@@ -344,6 +341,7 @@ def get_movies(inputTitle):
     # Change k to change the number of Recommendations output
 
     k = 5
+    #k_min_non_zero = np.partition(distance_results_rand[np.nonzero(distance_results_rand)], k)[:k]
     k_min_non_zero = np.partition(distance_results_rand[np.nonzero(distance_results_rand)], k)[:k]
     
     time_elapsed = round(time.time() - start_time, 1)
@@ -354,7 +352,7 @@ def get_movies(inputTitle):
 
     print(f'Number of entries in Distance Array: {len(distance_results_rand)}\n')
 
-    print(f'k_min_non_zero: {k_min_non_zero}')
+    print(f'k_min_non_zero: {k_min_non_zero}\n')
 
     print(f'{k} Recommendations:\n')
 
