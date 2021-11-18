@@ -3,6 +3,7 @@ Data/title_basics.tsv
 config.py
 index_backup.html
 model_backup.py
+model_backup_02.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
