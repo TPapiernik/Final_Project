@@ -327,7 +327,7 @@ def get_movies(inputTitle):
         if distance == 0:
             continue
         else:
-            distance = distance + random.randrange(1, 9, 1)/1e15
+            distance = distance + random.randrange(1, 9, 1)/10e15
             #distance = distance
             
         distance_results_rand.append(distance)
