@@ -315,34 +315,18 @@ def get_movies(inputTitle):
     distance_results = cdist(viewer_input, distance_inputs, 'euclidean')
 
 
-    # For each distance in distance_results, add a small random number
-    # if desired, to help guarantee uniqueness of distances
-    # (If distance is 0, leave it unchanged)
-    # To toggle feature, swap commented lines
-    # in else clause below.
-
-    distance_results_rand = []
-
-    for distance in distance_results[0]:
-        if distance == 0:
-            continue
-        else:
-            distance = distance + random.randrange(-9, 9, 1)/10e15
-            #distance = distance
-            
-        distance_results_rand.append(distance)
-
-    distance_results_rand = np.asarray(distance_results_rand)
-
-
     # #### Output Recommendations
 
     # Find the k Smallest Non-Zero Distance and their Positions
     # Change k to change the number of Recommendations output
 
     k = 5
-    #k_min_non_zero = np.partition(distance_results_rand[np.nonzero(distance_results_rand)], k)[:k]
-    k_min_non_zero = np.partition(distance_results_rand[np.nonzero(distance_results_rand)], k)[:k]
+
+    # Sort distance_results Array
+    # and exclude Zeroes
+
+    distance_results_sorted = np.sort(distance_results[0])
+    distance_results_sorted = distance_results_sorted[np.nonzero(distance_results_sorted)]
     
     time_elapsed = round(time.time() - start_time, 1)
 
@@ -350,22 +334,59 @@ def get_movies(inputTitle):
 
     print(f'Model Execution Time: {time_elapsed} seconds\n')
 
-    print(f'Number of entries in Distance Array: {len(distance_results_rand)}\n')
-
-    print(f'k_min_non_zero: {k_min_non_zero}\n')
+    print(f'Number of entries in Distance Array: {len(distance_results[0])}\n')
 
     print(f'{k} Recommendations:\n')
 
     recommendation_list = []
 
-    # Loop through k_min_non_zero
+    recommendation_dict = {}
 
-    for entry in k_min_non_zero:
+    # Loop until j = k
+
+    j = 0
+
+    # Initiate iterator for distance_results_sorted Array:
+    i = 0
+
+    # Get first result outside of loop
+    # Grab the first distance from distance_results_sorted:
+    entry = distance_results_sorted[i]
+
+
+    # Dictionary Output:
+    recommendation_index = list(distance_results[0]).index(entry)
+    recommendation_dict['title'] = clustered_df.iloc[recommendation_index]['primaryTitle']
+    recommendation_dict['url'] = clustered_df.iloc[recommendation_index]['url']
+    recommendation_dict['releaseYear'] = clustered_df.iloc[recommendation_index]['startYear']
+    recommendation_dict['averageRating'] = clustered_df.iloc[recommendation_index]['averageRating']
+    recommendation_dict['genres'] = clustered_df.iloc[recommendation_index]['genres'].replace(",", ", ")
+
+    recommendation_list.append(recommendation_dict)
+
+    i = i + 1
+    j = j + 1
+
+    #for entry in k_min_non_zero:
+    while j < k:
         
         recommendation_dict = {}
+        
+        if i == len(distance_results_sorted):
+            break
+
+        entry = distance_results_sorted[i]
 
         # Dictionary Output:
-        recommendation_index = list(distance_results_rand).index(entry)
+        recommendation_index = list(distance_results[0]).index(entry)
+        title = clustered_df.iloc[recommendation_index]['primaryTitle']
+
+        # If title is equal to the previous title, increment i and restart loop:
+
+        if title == recommendation_list[j-1]['title']:
+            i = i + 1
+            continue
+
         recommendation_dict['title'] = clustered_df.iloc[recommendation_index]['primaryTitle']
         recommendation_dict['url'] = clustered_df.iloc[recommendation_index]['url']
         recommendation_dict['releaseYear'] = clustered_df.iloc[recommendation_index]['startYear']
@@ -374,8 +395,8 @@ def get_movies(inputTitle):
 
         recommendation_list.append(recommendation_dict)
 
-        # Original Output:
-        #recommendation_list.append(clustered_df.iloc[recommendation_index]['primaryTitle'])
+        j = j + 1
+
 
     # Sort recommendatioin_list by 'averageRating'
     recommendation_list = sorted(recommendation_list, key=lambda d: d['averageRating'], reverse=True)
@@ -387,6 +408,9 @@ def get_movies(inputTitle):
 #input_movie_text = input("Movie Title: ")
 
 #input_movie_text = "Vertigo (1958)"
+#input_movie_text = "Sleepless in Seattle"
+#input_movie_text = "The Killing"
+#input_movie_text = "From Russia with Love"
 
 #print(get_movies(input_movie_text))
 #get_movies(input_movie_text)
