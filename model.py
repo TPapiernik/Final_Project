@@ -335,7 +335,7 @@ def get_movies(inputTitle):
     distance_results_rand = np.asarray(distance_results_rand)
 
     # Include only Unique Distances in Array
-    distance_results_rand = np.unique(distance_results_rand)
+    #distance_results_rand = np.unique(distance_results_rand)
 
 
     # #### Output Recommendations
@@ -353,6 +353,8 @@ def get_movies(inputTitle):
     print(f'Model Execution Time: {time_elapsed} seconds\n')
 
     print(f'Number of entries in Distance Array: {len(distance_results_rand)}\n')
+
+    print(f'k_min_non_zero: {k_min_non_zero}')
 
     print(f'{k} Recommendations:\n')
 
