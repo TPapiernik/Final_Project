@@ -20,13 +20,17 @@ app = Flask(__name__)
 @app.route("/", methods=['GET', 'POST'])
 
 def index():
+    movie = ""
     errors = []
     recommendations = []
+    input_title_info = {}
+
 
     if request.method == "POST":
         try:
             movie = request.form['inputMovie']
             #recommendations.append(movie)
+            input_title_info = model.get_inputTitle_info(movie)
             recommendations = model.get_movies(movie)
 
         except:
@@ -35,7 +39,7 @@ def index():
                     )
 
 
-    return render_template("index.html", errors=errors, movie=movie, recommendations=recommendations)
+    return render_template("index.html", errors=errors, movie=movie, input_title_info=input_title_info, recommendations=recommendations)
 
 #@app.route("/testDBConnection")
 

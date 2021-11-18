@@ -15,6 +15,100 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler, MultiLabelBinarizer, StandardScaler
 import time
 
+def get_inputTitle_info(inputTitle):
+
+
+    # Path to file directory and variables for input files.
+    file_dir = os.path.join("Data")
+
+    # imdb Titles metadata (Extracted from title.basics.tsv)
+    titles_metadata_file = f'{file_dir}/title_basics_non-adult_movies.tsv'
+
+    # imdb US Titles only ids (Extracted from title.akas.tsv)
+    titles_us_ids_only_file = f'{file_dir}/US_title_ids.csv'
+
+    # imdb Ratings data (Derived from title.ratings.tsv)
+    ratings_data_file = f'{file_dir}/title_ratings.csv'
+
+
+    viewerTitle = inputTitle
+
+
+    # ## Part 1: Import Data, Clean and Transform Data
+
+    # Import imdb Titles metadata, imdb US Title IDs, imdb Ratings data
+
+    titles_metadata = pd.read_csv(titles_metadata_file, sep='\t')
+    titles_us_ids_only = pd.read_csv(titles_us_ids_only_file)
+    ratings_data = pd.read_csv(ratings_data_file)
+
+
+    # Drop all Titles where primaryTitle differs from originalTitle
+    # (Since language of titles is not often available, this is an attempt
+    # to filter out obscure non-English language films)
+
+    titles_metadata = titles_metadata.loc[titles_metadata['primaryTitle'] == titles_metadata['originalTitle']]
+
+
+    # Look for Films with the same primaryTitle
+    # and set primaryTitle to primaryTitle + (startYear)
+
+    duplicate_titles_df = pd.concat(g for _, g in titles_metadata.groupby('primaryTitle') if len(g) > 1)
+
+    duplicate_titles_df['primaryTitle'] = duplicate_titles_df.apply(lambda row: "".join([row['primaryTitle'], " (", str(row['startYear']), ")"]), axis=1)
+    duplicate_titles_df['originalTitle'] = duplicate_titles_df['primaryTitle']
+
+
+    # Merge duplicate_titles_df back with titles_metadata
+
+    cols = list(titles_metadata.columns)
+    titles_metadata.loc[titles_metadata['tconst'].isin(duplicate_titles_df['tconst']), cols] = duplicate_titles_df[cols]
+
+
+    # Drop all Titles from titles_metadata that are not in titles_us_ids_only
+
+    titles_metadata = pd.merge(titles_metadata, titles_us_ids_only, on='tconst', how='inner')
+    titles_metadata = titles_metadata.drop_duplicates()
+
+
+    # Drop titles_metadata Rows with "\N" for genres and startYear
+    # Drop titleType isAdult and endYear Columns
+
+    titles_metadata = titles_metadata.loc[~(titles_metadata['genres'] == "\\N") & ~(titles_metadata['startYear'] == "\\N")]
+    titles_metadata.drop(['titleType'], axis=1, inplace=True)
+    titles_metadata.drop(['isAdult'], axis=1, inplace=True)
+    titles_metadata.drop(['endYear'], axis=1, inplace=True)
+
+
+    # Convert startYear Column to int
+
+    titles_metadata['startYear'] = pd.to_numeric(titles_metadata['startYear'])
+
+
+    # Drop titles_metadata Rows with 'startYear' less than 1920
+
+    titles_metadata = titles_metadata.loc[titles_metadata['startYear'] >= 1920]
+
+
+    # Merge titles_metadata and ratings_data on tconst
+
+    movies_df = pd.merge(titles_metadata, ratings_data, on="tconst")
+
+
+    # Add url column to movies_df
+    movies_df['url'] = movies_df.apply(lambda row: "".join(["https://www.imdb.com/title/", row['tconst'], "/"]), axis=1)
+
+    # Find Records for inputTitle in movies_df
+
+    inputTitle_info_dict = {}
+
+    inputTitle_info_dict['url'] = movies_df.loc[movies_df['primaryTitle'] == inputTitle]['url'].values[0]
+    inputTitle_info_dict['releaseYear'] = movies_df.loc[movies_df['primaryTitle'] == inputTitle]['startYear'].values[0]
+    inputTitle_info_dict['averageRating'] = movies_df.loc[movies_df['primaryTitle'] == inputTitle]['averageRating'].values[0]
+    inputTitle_info_dict['genres'] = movies_df.loc[movies_df['primaryTitle'] == inputTitle]['genres'].values[0].replace(",", ", ")
+
+    return inputTitle_info_dict
+
 def get_movies(inputTitle):
 
     start_time = time.time()
@@ -222,8 +316,10 @@ def get_movies(inputTitle):
 
 
     # For each distance in distance_results, add a small random number
-    # to help guarantee uniqueness of distances
+    # if desired, to help guarantee uniqueness of distances
     # (If distance is 0, leave it unchanged)
+    # To toggle feature, swap commented lines
+    # in else clause below.
 
     distance_results_rand = []
 
@@ -232,6 +328,7 @@ def get_movies(inputTitle):
             continue
         else:
             distance = distance + random.randrange(1, 9, 1)/1e15
+            #distance = distance
             
         distance_results_rand.append(distance)
 
@@ -255,6 +352,8 @@ def get_movies(inputTitle):
 
     print(f'Model Execution Time: {time_elapsed} seconds\n')
 
+    print(f'Number of entries in Distance Array: {len(distance_results_rand)}\n')
+
     print(f'{k} Recommendations:\n')
 
     recommendation_list = []
@@ -269,8 +368,9 @@ def get_movies(inputTitle):
         recommendation_index = list(distance_results_rand).index(entry)
         recommendation_dict['title'] = clustered_df.iloc[recommendation_index]['primaryTitle']
         recommendation_dict['url'] = clustered_df.iloc[recommendation_index]['url']
+        recommendation_dict['releaseYear'] = clustered_df.iloc[recommendation_index]['startYear']
         recommendation_dict['averageRating'] = clustered_df.iloc[recommendation_index]['averageRating']
-        recommendation_dict['genres'] = clustered_df.iloc[recommendation_index]['genres']
+        recommendation_dict['genres'] = clustered_df.iloc[recommendation_index]['genres'].replace(",", ", ")
 
         recommendation_list.append(recommendation_dict)
 

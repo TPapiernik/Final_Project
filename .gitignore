@@ -1,6 +1,7 @@
 # USER Section
 Data/title_basics.tsv
 config.py
+index_backup.html
 model_backup.py
 
 # Byte-compiled / optimized / DLL files
